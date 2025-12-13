@@ -39,7 +39,7 @@ class Booking(TimeStampedModel):
     slot = models.OneToOneField(
         TimeSlot,
         on_delete=models.CASCADE,
-        related_name="booking",
+        related_name="bookings",
     )
     status = models.CharField(
         max_length=20,

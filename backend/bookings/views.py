@@ -34,7 +34,7 @@ class AvailableTimeSlotsListView(generics.ListAPIView):
     def get_queryset(self):
         qs = TimeSlot.objects.all()
 
-        qs = qs.filter(start_date__gte=timezone.now())
+        qs = qs.filter(start_datetime__gte=timezone.now())
 
         qs = qs.annotate(
             has_booking=Exists(Booking.objects.filter(slot=OuterRef("id"))),

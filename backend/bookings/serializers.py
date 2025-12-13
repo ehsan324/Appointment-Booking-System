@@ -35,7 +35,7 @@ class TimeSLotSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     client_id = serializers.ReadOnlyField(source='client.id')
-    slot_id = serializers.PrimaryKeyRelatedField(source='slot.id', queryset=TimeSlot.objects.all() , write_only=True)
+    slot_id = serializers.PrimaryKeyRelatedField(source='slot', queryset=TimeSlot.objects.all() , write_only=True)
 
     class Meta:
         model = Booking
