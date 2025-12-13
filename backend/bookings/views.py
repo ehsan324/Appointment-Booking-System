@@ -4,7 +4,8 @@ from rest_framework.exceptions import ValidationError
 from django.utils import timezone
 from .models import TimeSlot, Booking
 from .serializers import TimeSLotSerializer, BookingSerializer
-from .permissions import IsProvider, IsClient, IsBookingOwner
+from .permissions import IsBookingOwner
+from core.permissions import IsProvider, IsClient
 from django.db.models import Exists, OuterRef
 from datetime import datetime
 
@@ -32,23 +33,20 @@ class AvailableTimeSlotsListView(generics.ListAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
-        qs = TimeSlot.objects.all()
+        qs = TimeSlot.objects.future().available()
 
-        qs = qs.filter(start_datetime__gte=timezone.now())
-
-        qs = qs.annotate(
-            has_booking=Exists(Booking.objects.filter(slot=OuterRef("id"))),
-        ).filter(has_booking=False)
+        provider_id = self.request.query_params.get("provider_id")
+        if provider_id:
+            qs = qs.filter(provider_id=provider_id)
 
         date_str = self.request.query_params.get("date")
         if date_str:
             try:
                 date_obj = datetime.fromisoformat(date_str).date()
-                qs = qs.filter(
-                    start_datetime__date=date_obj,
-                )
             except ValueError:
-                pass
+                raise ValidationError("Invalid date format. Use YYYY-MM-DD.")
+
+            qs = qs.filter(start_datetime__date=date_obj)
 
         return qs.order_by("start_datetime")
 
@@ -61,15 +59,9 @@ class BookingListCreateView(generics.ListCreateAPIView):
         user = self.request.user
         return Booking.objects.filter(client=user).order_by("-created_at")
 
-    def perform_create(self, serializer):
-        user = self.request.user
-        serializer.save(client=user)
-
 
 
 class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [permissions.IsAuthenticated, IsClient, IsBookingOwner]
-
-

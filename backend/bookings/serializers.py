@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import TimeSlot, Booking
 from providers.models import ProviderProfile
 from django.utils import timezone
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 
 
 class TimeSLotSerializer(serializers.ModelSerializer):
@@ -50,15 +52,15 @@ class BookingSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "client_id", "status", "created_at", "updated_at"]
 
-    def validate_slot(self, slot):
-        if slot.start_datetime < timezone.now():
-            raise serializers.ValidationError("Slot cannot be in the past.")
-        return slot
+    def create(self, validated_data):
+        request = self.context["request"]
+        user = request.user
+        slot = validated_data["slot"]
+        notes = validated_data.get("notes", "")
 
-    def validate(self, attrs):
-        slot = attrs.get("slot")
-
-        if Booking.objects.filter(slot=slot).exists():
-            raise serializers.ValidationError("Slot already exists.")
-
-        return attrs
+        try:
+            return Booking.objects.create_booking(client=user, slot=slot, notes=notes)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(
+                e.message_dict if hasattr(e, "message_dict") else e.messages
+            )

@@ -3,10 +3,9 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIV
     RetrieveUpdateAPIView
 from .models import ProviderProfile, Service
 from .serializers import ProviderProfileSerializer, ServiceSerializer
-from .permissions import IsProviderOrReadOnly, IsServiceOwnerOrReadOnly, IsProvider
+from .permissions import IsProviderOrReadOnly, IsServiceOwnerOrReadOnly
 from rest_framework.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
-
+from core.permissions import IsProvider, IsClient
 
 class ProviderProfileListView(ListAPIView):
     queryset = ProviderProfile.objects.all()
