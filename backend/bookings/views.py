@@ -8,6 +8,9 @@ from .permissions import IsBookingOwner
 from core.permissions import IsProvider, IsClient
 from django.db.models import Exists, OuterRef
 from datetime import datetime
+import logging
+
+logger = logging.getLogger("booking_app")
 
 
 class MyTimeSlotListCreateView(generics.ListCreateAPIView):
@@ -57,8 +60,16 @@ class BookingListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Booking.objects.filter(client=user).order_by("-created_at")
+        result = Booking.objects.filter(client=user).order_by("-created_at")
+        if result:
+            logger.info(
+                "New booking created",
+                extra={
+                    "client_id": self.request.user.id,
+                },
+            )
 
+        return result
 
 
 class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
