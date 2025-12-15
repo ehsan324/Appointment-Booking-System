@@ -4,7 +4,8 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+def get_env(name, default=None):
+    return os.getenv(name, default)
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-secret-key-change-me')
 
@@ -62,13 +63,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": get_env("POSTGRES_DB", "booking_db"),
+        "USER": get_env("POSTGRES_USER", "booking_user"),
+        "PASSWORD": get_env("POSTGRES_PASSWORD", "booking_password"),
+        "HOST": get_env("POSTGRES_HOST", "localhost"),
+        "PORT": get_env("POSTGRES_PORT", "5432"),
     }
 }
 

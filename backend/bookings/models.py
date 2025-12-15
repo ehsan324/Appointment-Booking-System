@@ -7,6 +7,7 @@ from core.models import TimeStampedModel
 from providers.models import ProviderProfile, Service
 from django.conf import settings
 
+
 class BookingManager(models.Manager):
     def create_booking(self, *, client, slot, notes=""):
         if slot.start_datetime < timezone.now():
