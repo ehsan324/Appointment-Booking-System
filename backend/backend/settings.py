@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    "drf_spectacular",
     'rest_framework.authtoken',
     'accounts',
     'providers',
@@ -146,6 +147,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 from datetime import timedelta
@@ -197,4 +199,18 @@ LOGGING = {
             "propagate": False,
         },
     },
+}
+
+
+from drf_spectacular.settings import SPECTACULAR_DEFAULTS  # اختیاری ولی خوبه بدونی
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Appointment Booking API",
+    "DESCRIPTION": "API for managing providers, services, time slots, and bookings.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SECURITY": [
+        {"BearerAuth": []},
+    ],
 }

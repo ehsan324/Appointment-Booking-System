@@ -8,6 +8,8 @@ from .permissions import IsBookingOwner
 from core.permissions import IsProvider, IsClient
 from django.db.models import Exists, OuterRef
 from datetime import datetime
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+
 import logging
 
 logger = logging.getLogger("booking_app")
@@ -54,6 +56,23 @@ class AvailableTimeSlotsListView(generics.ListAPIView):
         return qs.order_by("start_datetime")
 
 
+@extend_schema(
+    tags=["bookings"],
+    summary="List and create bookings for the current client",
+    description=(
+            "Returns the list of bookings for the authenticated client. "
+            "Allows creating a new booking for a given time slot."
+    ),
+    responses={
+        200: BookingSerializer,
+        201: BookingSerializer,
+        400: OpenApiResponse(
+            description="Validation error (e.g. slot already booked or in the past)"
+        ),
+        401: OpenApiResponse(description="Authentication required"),
+        403: OpenApiResponse(description="Only clients are allowed to create bookings"),
+    },
+)
 class BookingListCreateView(generics.ListCreateAPIView):
     serializer_class = BookingSerializer
     permission_classes = [permissions.IsAuthenticated, IsClient]
