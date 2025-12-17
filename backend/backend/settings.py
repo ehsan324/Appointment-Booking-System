@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework',
     "drf_spectacular",
     'rest_framework.authtoken',
+    'corsheaders',
     'accounts',
     'providers',
     'bookings',
@@ -69,6 +70,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    "corsheaders.middleware.CorsMiddleware",
+
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -148,6 +152,16 @@ REST_FRAMEWORK = {
     ),
     "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "1000/day",
+        "user": "50/minute",
+        "login_anon": "5/minute",
+        "booking_create": "20/hour",
+    }
 }
 
 from datetime import timedelta
@@ -214,3 +228,18 @@ SPECTACULAR_SETTINGS = {
         {"BearerAuth": []},
     ],
 }
+
+
+CORS_ALLOW_ALL_ORIGINS = False
+
+cors_origins = get_env("CORS_ORIGINS", "")
+if cors_origins:
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in cors_origins.split(",") if o.strip()]
+else:
+    if DEBUG:
+        CORS_ALLOWED_ORIGINS = [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ]
+    else:
+        CORS_ALLOWED_ORIGINS = []

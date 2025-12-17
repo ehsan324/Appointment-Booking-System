@@ -9,6 +9,7 @@ from core.permissions import IsProvider, IsClient
 from django.db.models import Exists, OuterRef
 from datetime import datetime
 from drf_spectacular.utils import extend_schema, OpenApiResponse
+from .throttles import BookingCreateRateThrottle
 
 import logging
 
@@ -71,11 +72,14 @@ class AvailableTimeSlotsListView(generics.ListAPIView):
         ),
         401: OpenApiResponse(description="Authentication required"),
         403: OpenApiResponse(description="Only clients are allowed to create bookings"),
+        429: OpenApiResponse(description="Too many requests (rate limit exceeded)"),
+
     },
 )
 class BookingListCreateView(generics.ListCreateAPIView):
     serializer_class = BookingSerializer
     permission_classes = [permissions.IsAuthenticated, IsClient]
+    throttle_classes = [BookingCreateRateThrottle]
 
     def get_queryset(self):
         user = self.request.user
