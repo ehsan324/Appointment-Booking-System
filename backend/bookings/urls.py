@@ -1,7 +1,7 @@
 from django.urls import path
-from bookings.view.bookings import BookingListCreateView, BookingDetailView
-from bookings.view.slots import AvailableTimeSlotsListView, MyTimeSlotListCreateView
-from bookings.view.cancellations import BookingCancelView
+from bookings.views.bookings import BookingListCreateView, BookingDetailView
+from bookings.views.slots import AvailableTimeSlotsListView, MyTimeSlotListCreateView
+from bookings.views.cancellations import BookingCancelView
 
 app_name = "bookings"
 

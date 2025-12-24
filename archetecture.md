@@ -13,3 +13,23 @@
 - Permissions:
   - `core.permissions.IsProvider` → نقش PROVIDER
   - `core.permissions.IsClient` → نقش CLIENT
+
+
+## Service Layer
+
+The project uses a service layer for business logic, separate from
+Django views and serializers.
+
+- `BookingService.create_booking(...)`  
+  - Validates time slot  
+  - Checks if already booked  
+  - Enforces client role  
+  - Saves the booking
+
+- `BookingService.cancel_booking(...)`  
+  - Ensures only client/provider can cancel  
+  - Avoids double-cancellation  
+  - Updates status safely
+
+Views only orchestrate permissions and routing, while all business rules
+live inside `services/`.

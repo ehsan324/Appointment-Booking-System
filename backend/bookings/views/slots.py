@@ -7,6 +7,17 @@ from datetime import datetime
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
+@extend_schema(
+    tags=["Slots"],
+    summary="Create Your SLots",
+    description="Create & Add your Slot for seeing Client",
+    responses={
+        201: TimeSLotSerializer,
+        400: OpenApiResponse(description="Invalid Inputs"),
+        429: OpenApiResponse(description="Too many attempts (rate limit)"),
+    }
+)
+
 class MyTimeSlotListCreateView(generics.ListCreateAPIView):
     serializer_class = TimeSLotSerializer
 
@@ -24,7 +35,17 @@ class MyTimeSlotListCreateView(generics.ListCreateAPIView):
 
         serializer.save(provider=user.provider_profile)
 
-
+@extend_schema(
+    tags=["Slots"],
+    summary="List of Available Slots",
+    description="Return And Show List of Available Slots for Client",
+    responses={
+        200: OpenApiResponse(description="Returned Successfully"),
+        401: OpenApiResponse(description="Authentication required"),
+        404: OpenApiResponse(description="No TimeSLot found"),
+        429: OpenApiResponse(description="Too many attempts (rate limit)"),
+    }
+)
 class AvailableTimeSlotsListView(generics.ListAPIView):
     serializer_class = TimeSLotSerializer
     permission_classes = (permissions.AllowAny,)

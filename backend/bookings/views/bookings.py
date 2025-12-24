@@ -48,6 +48,26 @@ class BookingListCreateView(generics.ListCreateAPIView):
         return result
 
 
+@extend_schema(
+    tags=["Bookings"],
+    summary="Detail of booking",
+    description=(
+            "See Detail of Booking Object "
+            "This endpoint enforces business rules: \n"
+            "- time slot must be in the future\n"
+            "- time slot must not already be booked\n"
+            "- user must have CLIENT role"
+    ),
+    responses={
+        201: BookingSerializer,
+        400: OpenApiResponse(description="Validation error"),
+        401: OpenApiResponse(description="Authentication required"),
+        403: OpenApiResponse(description="Forbidden: only clients can create bookings"),
+        429: OpenApiResponse(description="Too many requests (rate limit exceeded)"),
+    }
+
+)
+
 class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
