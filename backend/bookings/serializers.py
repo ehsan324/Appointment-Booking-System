@@ -3,6 +3,8 @@ from .models import TimeSlot, Booking
 from providers.models import ProviderProfile
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
+from bookings.services.booking_service import BookingService
+
 
 
 
@@ -58,9 +60,8 @@ class BookingSerializer(serializers.ModelSerializer):
         slot = validated_data["slot"]
         notes = validated_data.get("notes", "")
 
-        try:
-            return Booking.objects.create_booking(client=user, slot=slot, notes=notes)
-        except DjangoValidationError as e:
-            raise serializers.ValidationError(
-                e.message_dict if hasattr(e, "message_dict") else e.messages
-            )
+        return BookingService.create_booking(
+            client=user,
+            slot=slot,
+            notes=notes,
+        )
